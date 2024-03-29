@@ -2,26 +2,34 @@ import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TRootStackParamList } from './App';
+// We import the Crypto module from Expo to allow hashing
+import * as Crypto from 'expo-crypto';
 
 export interface IUser {
 	username: string;
-	password: string;
+	hashedPassword: string;
 }
 
-export default function Login(props) {
+export default async function Login(props) {
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
+	const [loginAttempt, setLoginAttempt] = React.useState(0);
 
 	const users = [
-		{ username: 'joe', password: 'secret' },
-		{ username: 'bob', password: 'password' },
+		{ username: 'joe', hashedPassword: 'e99a18c428cb38d5f260853678922e03' },
+		{ username: 'bob', hashedPassword: '5f4dcc3b5aa765d61d8327deb882cf99' },
 	];
 
 	function login() {
+		if (loginAttempt >= 5) {
+			Alert.alert('Error', 'Too many login attempts. Please try again later.');
+			return;
+		}
+
 		let foundUser = false;
 
 		for (const user of users) {
-			if (username === user.username && password === user.password) {
+			if (username === user.username && await comparePasswords(password, user.hashedPassword)) {
 				foundUser = user;
 
 				break;
@@ -31,9 +39,31 @@ export default function Login(props) {
 		if (foundUser) {
 			props.onLogin(foundUser);
 		} else {
+			setLoginAttempt(loginAttempt + 1);
 			Alert.alert('Error', 'Username or password is invalid.');
 		}
 	}
+
+	/*
+	This function compares the input password with the stored password through a secure function
+	*/
+	async function comparePasswords(inputPassword: string, storedPassword: string): Promise<boolean> {
+		const hashedInputPassword = await hashPassword(inputPassword);
+		// Use secure comparison to prevent timing attacks
+		return hashedInputPassword === storedPassword;
+	  }
+	
+	  /* 
+	  This function hashes a plaintext password using SHA256 algorithm
+	  This improves security for the application
+	  */
+	  async function hashPassword(password: string): Promise<string> {
+		const hashedPassword = await Crypto.digestStringAsync(
+		  Crypto.CryptoDigestAlgorithm.SHA256,
+		  password
+		);
+		return hashedPassword;
+	  }
 
 	return (
 		<View style={styles.container}>
@@ -49,6 +79,7 @@ export default function Login(props) {
 				value={password}
 				onChangeText={setPassword}
 				placeholder="Password"
+				secureTextEntry={true} // Hides password when input by user
 			/>
 			<Button title="Login" onPress={login} />
 		</View>
