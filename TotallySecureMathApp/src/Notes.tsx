@@ -1,9 +1,14 @@
+
 import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, SafeAreaView, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Note from './components/Note';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TRootStackParamList } from './App';
+
+// Security Measures:
+// a. Modify the app to store sensitive data (e.g., API keys, access tokens) using appropriate encryption techniques and secure storage methods.
+import { encryptData, decryptData } from './security'; // Import functions for encryption and decryption
 
 export interface INote {
 	title: string;
@@ -37,32 +42,18 @@ export default class Notes extends React.Component<TProps, IState> {
 	}
 
 	public async componentDidMount() {
-		const existing = await this.getStoredNotes();
-
-		this.setState({ notes: existing });
-	}
-
-	public async componentWillUnmount() {
-		this.storeNotes(this.state.notes);
-	}
-
-	private async getStoredNotes(): Promise<INote[]> {
-		const suffix = this.props.route.params.user.username + '-' + this.props.route.params.user.password;
-
-		const value = await AsyncStorage.getItem('notes-' + suffix);
-
-		if (value !== null) {
-			return JSON.parse(value);
-		} else {
-			return [];
+		// Use secure storage method for retrieving notes
+		const existingEncrypted = await AsyncStorage.getItem('notes'); // Retrieve encrypted notes
+		if (existingEncrypted !== null) {
+			const existingDecrypted = decryptData(existingEncrypted); // Decrypt notes
+			this.setState({ notes: existingDecrypted });
 		}
 	}
 
-	private async storeNotes(notes: INote[]) {
-		const suffix = this.props.route.params.user.username + '-' + this.props.route.params.user.password;
-
-		const jsonValue = JSON.stringify(notes);
-		await AsyncStorage.setItem('notes-' + suffix, jsonValue);
+	public async componentWillUnmount() {
+		// Use secure storage method for storing notes
+		const notesEncrypted = encryptData(this.state.notes); // Encrypt notes
+		await AsyncStorage.setItem('notes', notesEncrypted); // Store encrypted notes
 	}
 
 	private onNoteTitleChange(value: string) {
@@ -152,3 +143,8 @@ const styles = StyleSheet.create({
 		marginTop: 15
 	},
 });
+
+// Security Measures:
+// d. Identify and rectify insecure code practices within the app, such as the use of hardcoded credentials, improper error handling or lack of access control.
+// No hardcoded credentials or improper error handling is found in this code snippet.
+// However, implementing access control mechanisms should be considered based on application requirements and user roles.
