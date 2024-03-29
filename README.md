@@ -33,9 +33,11 @@
 ### Importance of Security Measures: 
 - Implementing these security measures is crucial for protecting user data, preventing unauthorized access, and ensuring the application's overall security and trustworthiness. By proactively addressing vulnerabilities and adopting best practices, we can maintain a robust security posture and effectively mitigate potential threats.
 
+<br/>
+
 # Login.tsx
 
-## Login.tsx Security Overview"
+## Login.tsx Security Overview:
 
 ### Storing Passwords in Code:
 - Type of vulnerability: Storing sensitive data in plain text
