@@ -80,6 +80,7 @@
 ### Final Notes:
 - If this were a production application that interacted with a database or had a sign-up method, we could implement input sanitation and password complexity. This would help to mitigate account takeovers and SQL injections. We could also implement session management to create more secure communication with the server-side
   
+<<<<<<< Updated upstream
 # Note.tsx
 
 ## Note.tsx Security Overview:
@@ -105,3 +106,28 @@
 
 ### Final Notes:
 - It is obvious that the application needs proper error handling and input validation to reduce security risks from attacks such as SQL injection.
+=======
+
+<br/>
+
+
+# App.tsx
+
+## App.tsx Security Overview:
+
+
+### Insecure Storage of Sensitive Data
+- Insecure Storage, app does not implement any encryption or secure storage methods for data. This leads to unauthorized access to information. 
+
+### Improper Authentication
+- App uses simple state to handle users login status. This approach does not provide security measure against unauthorized access or session hijacking. 
+
+### Input Validation 
+- App does not perform any input validation on users input such as those during login process. This could lead to code injection attacks. 
+
+### Reflection and Best Practices
+- Always encrypt sensitive data , implement secure authentication mechanisms. 
+
+### Updates in APP.tsx
+- Async Storage saves users login state across app restarts. By storing the user's data in AsyncStorage and retrieving it asynchronously, the app ensures that sensitive information is stored securely.
+>>>>>>> Stashed changes

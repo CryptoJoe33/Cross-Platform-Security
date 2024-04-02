@@ -22,29 +22,57 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Notes from './Notes';
 import Login, { IUser } from './Login';
 
-// Fix export statement
-const AppExports = {
-    Login: undefined,
+export type TRootStackParamList = {
+    Login: undefined;
     Notes: {
-        user: IUser,
-    },
+        user: IUser;
+    };
 };
 
 function App() {
     const [signedInAs, setSignedInAs] = React.useState<IUser | false>(false);
 
-    const Stack = createNativeStackNavigator();
+    const Stack = createNativeStackNavigator<TRootStackParamList>();
 
+    useEffect(() => {
+        const bootstrapAsync = async () => {
+            try {
+                const user = await AsyncStorage.getItem('user');
+                if (user) {
+                    setSignedInAs(JSON.parse(user));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        bootstrapAsync();
+    }, []);
+
+    const onLogin = async (user: IUser) => {
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        setSignedInAs(user);
+    }
+
+    const onLogout = async () => {
+        await AsyncStorage.removeItem('user');
+        setSignedInAs(false);
+    }
+
+
+    
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                {
-                    !signedInAs ?
-                        <Stack.Screen name="Login">
-                            {(props) => <Login {...props} onLogin={(user) => setSignedInAs(user)} />}
-                        </Stack.Screen> :
-                        <Stack.Screen name="Notes" component={Notes} initialParams={{ user: signedInAs }} />
-                }
+                {signedInAs ? (
+                    <Stack.Screen name="Notes">
+                        {props => <Notes {...props} user={signedInAs} onLogout={onLogout} />}
+                    </Stack.Screen>
+                ) : (
+                    <Stack.Screen name="Login">
+                        {props => <Login {...props} onLogin={onLogin} />}
+                    </Stack.Screen>
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     );
