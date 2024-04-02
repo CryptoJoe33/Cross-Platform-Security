@@ -4,9 +4,26 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 
 function Note(props) {
 	function evaluateEquation() {
-		const result = eval(props.text);
 
-		Alert.alert('Result', 'Result: ' + result);
+		// check for invalid characters
+		if (!isValidText(props.text)) {
+			Alert.alert('Error', 'Invalid equation');
+			return;
+		}
+
+		try{ // evaluate the equation
+			const result =	eval(props.text);
+			Alert.alert('Result', 'Result: ' + result);
+		} catch	(error) { // catch invalid equations
+			Alert.alert('Error', 'Invalid equation');
+			return;
+		}
+	}
+
+	// function to check for invalid characters using regex
+	function isValidText(text) {
+		const regex = /^[0-9\+\-\*\/\(\) ]+$/;
+		return regex.test(text);
 	}
 
 	return (
