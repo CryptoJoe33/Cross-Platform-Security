@@ -91,3 +91,17 @@
 ### Improper Input Validation:
 - Type of Vulnerability: Input Validation
 - Description: Lacks proper input validation when evaluating text. may lead to injection attacks such as SQL injection.
+
+## Addressing Vulnerabilities:
+- The following has been implemented to improve security
+
+### Regex Check
+- Created Function IsValidText()
+- Uses a regex expression to check the user input for valid and appropriate mathematical expressions
+
+### Error Handling
+- Implemented Try-Catch Block
+- Is used to improve error handling when evaluating mathematical expression.
+
+### Final Notes:
+- It is obvious that the application needs proper error handling and input validation to reduce security risks from attacks such as SQL injection.
